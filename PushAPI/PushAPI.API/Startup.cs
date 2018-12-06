@@ -21,6 +21,7 @@ using PushAPI.DAL.GenericEntity;
 using Swashbuckle.AspNetCore.Swagger;
 using Newtonsoft.Json;
 using Serilog;
+using PushAPI.API.SignalR;
 
 namespace PushAPI.API
 {
@@ -56,6 +57,12 @@ namespace PushAPI.API
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero,
             };
+
+            services.AddCors(o => o.AddPolicy("CorsPolicy", b =>
+            {
+                b.WithOrigins("http://localhost:3000").AllowCredentials().AllowAnyHeader().AllowAnyMethod();
+            }
+            ));
 
             services.AddAuthentication(options =>
             {
@@ -101,6 +108,8 @@ namespace PushAPI.API
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
 
+            services.AddSignalR();
+
             // Register the Swagger generator, defining one or more Swagger documents
             services.AddSwaggerGen(c =>
             {
@@ -111,10 +120,7 @@ namespace PushAPI.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            app.UseCors(builder =>
-            {
-                builder.AllowCredentials().AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-            });
+            app.UseCors("CorsPolicy");
 
             app.UseStaticFiles();
 
@@ -139,6 +145,11 @@ namespace PushAPI.API
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "PushAPI");
+            });
+
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<MessageHub>("/message");
             });
 
             app.UseMvc();

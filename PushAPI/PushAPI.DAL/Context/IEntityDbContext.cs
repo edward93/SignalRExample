@@ -9,7 +9,7 @@ namespace PushAPI.DAL.Context
 {
     public interface IEntityDbContext : IDisposable
     {
-        DbSet<User> Users { get; set; }
+        DbSet<SystemMessage> SystemMessages { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
         DbSet<T> Set<T>() where T : class;

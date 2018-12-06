@@ -26,6 +26,6 @@ namespace PushAPI.DAL.Context
             }
         }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<SystemMessage> SystemMessages { get; set; }
     }
 }
